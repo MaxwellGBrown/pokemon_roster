@@ -1,11 +1,40 @@
 """Access the database."""
 import cmd
 import json
-import sys
+import random
+import string
 
 import boto3
 
 
+def _index(pool=string.hexdigits):
+    return "".join(random.choice(pool) for _ in range(8))
+
+
+def _ivs():
+    ivs = input("ivs (HP/Atk/Def/SpA/SpD/Spe):")
+    hp, atk, de, spa, spd, spe = ivs.split("/")
+    return {
+        "HP": hp,
+        "Attack": atk,
+        "Defense": de,
+        "Special Attack": spa,
+        "Special Defense": spd,
+        "Speed": spe
+    }
+
+
+def _evs():
+    evs = input("evs (HP/Atk/Def/SpA/SpD/Spe):")
+    hp, atk, de, spa, spd, spe = evs.split("/")
+    return {
+        "HP": hp,
+        "Attack": atk,
+        "Defense": de,
+        "Special Attack": spa,
+        "Special Defense": spd,
+        "Speed": spe
+    }
 
 
 class RosterCmd(cmd.Cmd):
@@ -27,19 +56,22 @@ class RosterCmd(cmd.Cmd):
 
     def do_scan(self, arg):
         """Scan the table for pokemon entries."""
-        print(arg)
-        print(dir(self))
 
         results = self._table.scan()
         for item in results["Items"]:
-            print(json.dumps(item, indent=2))
+            self._print(json.dumps(item, indent=2))
 
     def do_insert(self, pokemon):
         """Begin an insert for this record."""
-        index = input("Index >>> ")
         self._table.put_item(Item={
             "Pokemon": pokemon,
-            "Index": index
+            "Index": _index(),
+            "nickname": input("nickname: "),
+            "ability": input("ability: "),
+            "nature": input("nature: "),
+            "ivs": _ivs(),
+            "evs": _evs(),
+            "moves": [input(f"move {i}: ") for i in range(4)]
         })
 
 
