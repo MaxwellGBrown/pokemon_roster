@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  DynamoDB Table to hold pokemon roster records
+
+Resources:
+  RosterTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        # e.g. Charmander | 0
+        - AttributeName: Pokemon
+          AttributeType: S
+        - AttributeName: Index
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Pokemon
+          KeyType: HASH
+        - AttributeName: Index
+          KeyType: RANGE
+
+Outputs:
+  EventBus:
+    Description: Name of created event bus
+    Value: !Ref RosterTable
+    Export:
+      Name: roster-table
